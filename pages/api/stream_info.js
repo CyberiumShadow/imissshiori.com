@@ -11,7 +11,7 @@ export default async function handler(req, res) {
             ytStreamData: {
                 status: STREAM_STATUS.OFFLINE,
                 streamInfo: {
-                    link: "https://imissfauna.com",
+                    link: "https://imissshiori.com",
                     title: "Page refresh required",
                     startTime: 1661590060000,
                     thumbnail: null,
