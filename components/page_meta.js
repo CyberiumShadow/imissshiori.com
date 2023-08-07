@@ -35,7 +35,7 @@ export function CommonFooter(props) {
         <small>
             {lang.formatString(
                 lang.CommonMetadata.FooterText,
-                <a href="https://github.com/saplinganon/imissfauna.com">{lang.CommonMetadata.FooterSourceLink}</a>
+                <a href="https://github.com/cyberiumshadow/imissshiori.com">{lang.CommonMetadata.FooterSourceLink}</a>
             )}
         </small>
     </footer>
