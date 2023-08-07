@@ -31,7 +31,7 @@
 }
 
 .streamInfo {
-    background: linear-gradient(rgba(183, 159, 205, 0.3) 0%, rgb(183, 159, 205) 100%);
+    background: linear-gradient(rgba(139, 128, 173, 0.3) 0%, rgb(139, 128, 173) 100%);
     border: 1px solid rgb(117, 207, 137);
     border-radius: 6px;
     padding: 0.8rem;
