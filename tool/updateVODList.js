@@ -3,7 +3,7 @@ const process = require("process")
 const fetch = require("node-fetch")
 const sqlite3 = require("sqlite3")
 const decode = require("html-entities").decode
-const pgClient = require("pg").Client
+import { db } from '@vercel/postgres';
 
 class PostgresDatabase {
     constructor() {
@@ -11,16 +11,13 @@ class PostgresDatabase {
     }
     
     async _connect() {
-        for (let i = 0; i < 3; ++i) {
-            try {
-                this.connection = new pgClient({connectionTimeoutMillis: 5000})
-                await this.connection.connect()
-                return this
-            } catch (e) {
-                console.error("[_connect]", "error connecting", e)
-            }
+        try {
+            this.connection = await db.connect();
+            return this
+        } catch (e) {
+            console.error("[_connect]", "error connecting", e)
         }
-    
+
         throw new Error("[_connect]: all connection attempts failed")
     }
     
