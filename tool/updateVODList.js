@@ -3,7 +3,7 @@ const process = require("process")
 const fetch = require("node-fetch")
 const sqlite3 = require("sqlite3")
 const decode = require("html-entities").decode
-import { db } from '@vercel/postgres';
+const { db } = require("@vercel/postgres")
 
 class PostgresDatabase {
     constructor() {
