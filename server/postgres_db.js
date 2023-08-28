@@ -1,5 +1,5 @@
 import { STREAM_TYPE } from "../common/enums"
-import { db } from '@vercel/postgres';
+import { Client } from 'pg';
 
 export class PostgresCoordinator {
     constructor() {
@@ -8,7 +8,8 @@ export class PostgresCoordinator {
 
     async _connect() {
         try {
-            this.connection = await db.connect();
+            this.connection = new Client({ connectionTimeoutMillis: 1500 })
+            await this.connection.connect()
             return this
         } catch (e) {
             console.error("[_connect]", "error connecting", e)
@@ -94,7 +95,7 @@ export class PostgresCoordinator {
         console.debug("[getConfig]", "exit")
         return res.rows[0]?.val
     }
-    
+
     async getVod() {
         console.debug("[getVod]", "enter")
         let res

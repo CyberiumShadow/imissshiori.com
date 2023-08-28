@@ -3,16 +3,17 @@ const process = require("process")
 const fetch = require("node-fetch")
 const sqlite3 = require("sqlite3")
 const decode = require("html-entities").decode
-const { db } = require("@vercel/postgres")
+const pgClient = require("pg").Client
 
 class PostgresDatabase {
     constructor() {
         this.connection = null
     }
-    
+
     async _connect() {
         try {
-            this.connection = await db.connect();
+            this.connection = new pgClient({ connectionTimeoutMillis: 5000 })
+            await this.connection.connect()
             return this
         } catch (e) {
             console.error("[_connect]", "error connecting", e)
@@ -20,7 +21,7 @@ class PostgresDatabase {
 
         throw new Error("[_connect]: all connection attempts failed")
     }
-    
+
     async insertVods(vodEntries) {
         const ts = Date.now()
         console.debug("[insertVod]", "enter")
@@ -41,7 +42,7 @@ class PostgresDatabase {
         })
         console.debug("[insertVod]", "exit")
     }
-    
+
     async transaction(f) {
         let retVal
         try {
@@ -54,11 +55,11 @@ class PostgresDatabase {
         }
         return retVal
     }
-    
+
     async teardown() {
         console.debug("[teardown]", "closing connection now")
         await this.connection.end()
-    }   
+    }
 }
 
 class SQLiteDatabase {
@@ -79,7 +80,7 @@ class SQLiteDatabase {
                 _last_valid         = excluded._last_valid
         `)
 
-        vodEntries.forEach((v) => 
+        vodEntries.forEach((v) =>
             stmt.run([
                 v.videoID, v.title, v.thumbnail, v.uploaded_date, v.length_seconds
             ])
@@ -99,7 +100,7 @@ function makeAPIURL(pageToken) {
     if (pageToken) {
         pageSpecifier = `pageToken=${pageToken}&`
     }
-    
+
     return `https://youtube.googleapis.com/youtube/v3/search?${pageSpecifier}part=snippet&channelId=${channelID}&maxResults=500&order=date&type=video&key=${apiKey}`
 }
 
@@ -120,7 +121,7 @@ async function main() {
     } else {
         db = await (new PostgresDatabase())._connect()
     }
-    
+
     let nextUrl = makeAPIURL()
     while (nextUrl) {
         const resp = await fetch(nextUrl)
@@ -129,17 +130,17 @@ async function main() {
             console.error(await resp.json())
             break
         }
-        
+
         const data = await resp.json()
         await db.insertVods(data.items.map((video) => collect(video)))
-        
+
         if (data.nextPageToken) {
             nextUrl = makeAPIURL(data.nextPageToken)
         } else {
             break
         }
     }
-    
+
     await db.teardown()
 }
 
